@@ -256,6 +256,10 @@ async function main(settings) {
   });
 
   if (count === 0) {
+    if (config.widgetFamily === "medium" || config.widgetFamily === "large") {
+      currentLessonStack.size = new Size(1, 1);
+      currentLessonStack.setPadding(0, 0, 0, 0);
+    }
     let i = list.addText("×");
     i.textColor = settings.textColor;
     i.font = Font.lightSystemFont(48);
