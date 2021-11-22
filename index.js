@@ -1,5 +1,5 @@
 const settings = {
-  offset: -7,
+  offset: 0,
   lang: "gr1n",
   wf: "CH",
   angInf: "gr1",
