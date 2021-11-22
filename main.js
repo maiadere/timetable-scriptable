@@ -260,11 +260,11 @@ async function main(settings) {
       currentLessonStack.size = new Size(1, 1);
       currentLessonStack.setPadding(0, 0, 0, 0);
     }
-    let i = list.addText("×");
-    i.textColor = settings.textColor;
-    i.font = Font.lightSystemFont(48);
-    i.textOpacity = 0.5;
-    i.centerAlignText();
+    // let i = list.addText("×");
+    // i.textColor = settings.textColor;
+    // i.font = Font.lightSystemFont(48);
+    // i.textOpacity = 0.5;
+    // i.centerAlignText();
     let t = list.addText("There are no lessons");
     t.textColor = settings.textColor;
     t.font = Font.boldSystemFont(12);
