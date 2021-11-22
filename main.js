@@ -73,7 +73,7 @@ async function main(settings) {
   const date = new Date();
 
   try {
-    const req = new Request("https://timetable-api.vloapp.pl");
+    const req = new Request(`https://timetable-api.vloapp.pl/?offset=${settings.offset || 0}`);
     const res = await req.loadJSON();
     const t = res[date.getDay() - 1];
 
