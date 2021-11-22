@@ -87,6 +87,8 @@ async function main(settings) {
   } catch (e) {
     console.log(e);
   }
+  
+  console.log(today);
 
   let count = 0;
 
