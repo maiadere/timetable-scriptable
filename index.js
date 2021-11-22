@@ -1,4 +1,5 @@
 const settings = {
+  offset: -7,
   lang: "gr1n",
   wf: "CH",
   angInf: "gr1",
@@ -22,10 +23,6 @@ async function downloadModule(scriptName, scriptUrl) {
   if (fm.fileExists(moduleDir) && !fm.isDirectory(moduleDir)) fm.remove(moduleDir);
   if (!fm.fileExists(moduleDir)) fm.createDirectory(moduleDir);
   let modulePath = fm.joinPath(moduleDir, "main.js");
-
-  if (fm.fileExists(modulePath) && new Date() - fm.modificationDate(modulePath) >= 86400000) {
-    return modulePath;
-  }
 
   console.log("Downloading main.js from URL: " + scriptUrl);
 
