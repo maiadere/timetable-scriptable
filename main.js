@@ -148,32 +148,16 @@ async function main(settings) {
       currentLessonStack.addSpacer(6);
 
       let timer = currentLessonStack.addStack();
-      timer.size = new Size(100, 25);
+      timer.size = new Size(0, 25);
       timer.setPadding(2.5, 5, 2.5, 5);
       timer.centerAlignContent();
       timer.cornerRadius = 10;
       timer.backgroundColor = new Color("#fff", 0.125);
-
-      if (startTime > date) {
-        let timerText = timer.addText("in ");
-        timerText.font = Font.boldSystemFont(12);
-        timerText.textOpacity = 0.8;
-        timerText.textColor = settings.textColor;
-      }
-
-      const dateWidget = timer.addDate(endTime);
-      dateWidget.font = Font.boldSystemFont(12);
-      dateWidget.textOpacity = 0.8;
-      dateWidget.textColor = settings.textColor;
-      dateWidget.applyRelativeStyle();
-      currentLessonStack.addSpacer(25);
-
-      if (startTime <= date) {
-        let timerText = timer.addText(" left");
-        timerText.font = Font.boldSystemFont(12);
-        timerText.textOpacity = 0.8;
-        timerText.textColor = settings.textColor;
-      }
+      
+      let timerText = timer.addText(lesson.room.code);
+      timerText.font = Font.boldSystemFont(12);
+      timerText.textOpacity = 0.8;
+      timerText.textColor = settings.textColor;
 
       const fakeBtn = currentLessonStack.addText("View all →");
       fakeBtn.font = Font.blackSystemFont(14);
