@@ -154,7 +154,7 @@ async function main(settings) {
       room.cornerRadius = 10;
       room.backgroundColor = new Color("#fff", 0.125);
       
-      let roomText = timer.addText(lesson.room.code);
+      let roomText = room.addText(lesson.room.code);
       roomText.font = Font.boldSystemFont(12);
       roomText.textOpacity = 0.8;
       roomText.textColor = settings.textColor;
