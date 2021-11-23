@@ -146,18 +146,22 @@ async function main(settings) {
       teacher.textColor = settings.textColor;
       teacher.lineLimit = 1;
       currentLessonStack.addSpacer(6);
-
-      let timer = currentLessonStack.addStack();
-      timer.size = new Size(0, 25);
-      timer.setPadding(2.5, 5, 2.5, 5);
-      timer.centerAlignContent();
-      timer.cornerRadius = 10;
-      timer.backgroundColor = new Color("#fff", 0.125);
       
-      let timerText = timer.addText(lesson.room.code);
-      timerText.font = Font.boldSystemFont(12);
-      timerText.textOpacity = 0.8;
-      timerText.textColor = settings.textColor;
+      let roomStack = currentLessonStack.addStack();
+      roomStack.size = new Size(0, 25);
+      timer.setPadding(0, 0, 25, 0);
+
+      let room = roomStack.addStack();
+      room.size = new Size(0, 25);
+      room.setPadding(2.5, 5, 2.5, 5);
+      room.centerAlignContent();
+      room.cornerRadius = 10;
+      room.backgroundColor = new Color("#fff", 0.125);
+      
+      let roomText = timer.addText(lesson.room.code);
+      roomText.font = Font.boldSystemFont(12);
+      roomText.textOpacity = 0.8;
+      roomText.textColor = settings.textColor;
 
       const fakeBtn = currentLessonStack.addText("View all →");
       fakeBtn.font = Font.blackSystemFont(14);
