@@ -177,7 +177,7 @@ async function main(settings) {
     }
 
     const lessonStack = list.addStack();
-    lessonStack.size = new Size(135, 0);
+    lessonStack.size = new Size(settings.lessonWidth || 135, 0);
     lessonStack.backgroundColor = settings.boxColor || new Color("#fff", startTime <= date && date <= endTime ? 0.25 : 0.125);
     lessonStack.cornerRadius = 10;
     lessonStack.setPadding(-1, 10, 0, 5);
