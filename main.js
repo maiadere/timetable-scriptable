@@ -26,14 +26,6 @@ class Cache {
   }
 }
 
-function drawText(canvas, text, textColor, textOffset, fontSize) {
-  const textRect = new Rect(canvTextSize / 2 - 20, textOffset - canvTextSize / 2, canvSize, canvTextSize);
-  canvas.setTextColor(textColor);
-  canvas.setFont(Font.boldSystemFont(fontSize));
-  canvas.setTextAlignedCenter();
-  canvas.drawTextInRect(text, textRect);
-}
-
 const toTitleCase = (phrase) =>
   phrase
     .toLowerCase()
@@ -154,7 +146,7 @@ async function main(settings) {
       room.cornerRadius = 10;
       
       if (lesson.room) {
-        room.backgroundColor = new Color("#fff", 0.125);
+        room.backgroundColor = settings.boxColor || new Color("#fff", 0.125);
       
         let roomText = room.addText(lesson.room.code);
         roomText.font = Font.boldSystemFont(12);
@@ -185,8 +177,8 @@ async function main(settings) {
     }
 
     const lessonStack = list.addStack();
-    lessonStack.size = new Size(135, 0);
-    lessonStack.backgroundColor = new Color("#fff", startTime <= date && date <= endTime ? 0.25 : 0.125);
+    lessonStack.size = new Size(settings.lessonWidth || 135, 0);
+    lessonStack.backgroundColor = settings.boxColor || new Color("#fff", startTime <= date && date <= endTime ? 0.25 : 0.125);
     lessonStack.cornerRadius = 10;
     lessonStack.setPadding(-1, 10, 0, 5);
     lessonStack.layoutHorizontally();
@@ -203,19 +195,56 @@ async function main(settings) {
     stack.size = new Size(stackSize, 0);
     stack.layoutVertically();
     stack.centerAlignContent();
+    
+    let wstack;
+    
+    if (settings.reversedOrder) {
+       wstack = stack.addStack();
+      wstack.setPadding(5, 0, 0, 0);
+    }
+    
 
-    const rstack = lessonStack.addStack();
+    let rstack;
+    
+    if (!settings.roomPipe) {
+      rstack = lessonStack.addStack();
     rstack.setPadding(1, 0, 0, 0);
     rstack.size = new Size(20, 0);
     stack.addSpacer(5);
-
+    }         
+                    
+    if (settings.roomPipe && lesson.room) {
+      let wsubtitle = stack.addStack();
+      
+      let t = wsubtitle.addText(lesson.time);
+    t.font = Font.mediumSystemFont(12);
+    t.textOpacity = 0.8;
+    t.textColor = settings.textColor;
+    
+    let pipe = wsubtitle.addText(settings.pipeText || " | ");
+    pipe.font = Font.mediumSystemFont(12);
+    pipe.textOpacity = 0.4;
+    pipe.textColor = settings.textColor;
+    
+    let t2 = wsubtitle.addText(lesson.room.code);
+    t2.font = Font.mediumSystemFont(12);
+    t2.textOpacity = 0.8;
+    t2.textColor = settings.textColor;
+    
+    } else {
+      
     let wsubtitle = stack.addText(lesson.time);
     wsubtitle.font = Font.mediumSystemFont(12);
     wsubtitle.textOpacity = 0.8;
     wsubtitle.textColor = settings.textColor;
+  }
 
-    let wstack = stack.addStack();
-    wstack.setPadding(0, 0, 5, 0);
+    
+    if (!settings.reversedOrder) {
+       wstack = stack.addStack();
+      wstack.setPadding(0, 0, 5, 0);
+    }
+    
 
     if (lesson.change && lesson.change.change.type === 2) {
       try {
@@ -241,7 +270,7 @@ async function main(settings) {
     wtitle.textColor = settings.textColor;
     wtitle.lineLimit = 1;
 
-    if (lesson.room) {
+    if (!settings.roomPipe && lesson.room) {
       let room = rstack.addText(lesson.room.code);
       room.font = Font.boldSystemFont(12);
       room.textOpacity = 0.4;
@@ -266,10 +295,10 @@ async function main(settings) {
     t.textColor = settings.textColor;
     t.font = Font.boldSystemFont(12);
     t.centerAlignText();
-    list.setPadding(0, 0, 12, 0);
+//     list.setPadding(0, 0, 12, 0);
   }
 
-  config.runsInWidget ? Script.setWidget(app) : await app.presentMedium();
+  settings.dev && config.runsInWidget ? Script.setWidget(app) : await app.presentMedium();
   Script.complete();
 }
 
