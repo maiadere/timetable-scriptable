@@ -187,7 +187,7 @@ async function main(settings) {
         
     let stackSize = settings.lessonWidth ? settings.lessonWidth - 30 : 105;
     
-    if (!settings.roomPipe) {
+    if (settings.roomPipe) {
       stackSize += 20;
     }
     
