@@ -214,7 +214,7 @@ async function main(settings) {
     t.textOpacity = 0.8;
     t.textColor = settings.textColor;
     
-    let pipe = wsubtitle.addText(pipeText || " | ");
+    let pipe = wsubtitle.addText(settings.pipeText || " | ");
     pipe.font = Font.mediumSystemFont(12);
     pipe.textOpacity = 0.4;
     pipe.textColor = settings.textColor;
