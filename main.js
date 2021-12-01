@@ -192,8 +192,15 @@ async function main(settings) {
     lessonStack.layoutHorizontally();
     lessonStack.centerAlignContent();
 
+        
+    let stackSize = settings.lessonWidth ? settings.lessonWidth - 30 : 105;
+    
+    if (!settings.roomPipe) {
+      stackSize += 20;
+    }
+    
     const stack = lessonStack.addStack();
-    stack.size = new Size(105, 0);
+    stack.size = new Size(stackSize, 0);
     stack.layoutVertically();
     stack.centerAlignContent();
 
