@@ -37,7 +37,7 @@ async function main(settings) {
   const background = new LinearGradient();
   background.startPoint = new Point(0, 0);
   background.endPoint = new Point(1, 1);
-  background.locations = [-1, 2];
+  background.locations = settings.backgroundLocations || [-1, 2];
   background.colors = settings.background;
 
   const app = new ListWidget();
