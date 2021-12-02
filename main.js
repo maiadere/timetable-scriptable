@@ -298,7 +298,7 @@ async function main(settings) {
 //     list.setPadding(0, 0, 12, 0);
   }
 
-  !settings.dev && config.runsInWidget ? Script.setWidget(app) : await app.presentMedium();
+  !settings.dev || config.runsInWidget ? Script.setWidget(app) : await app.presentMedium();
   Script.complete();
 }
 
