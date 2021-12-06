@@ -23,4 +23,4 @@ Following settings are available:
 | lessonWidth | `number` | Lesson box width |
 | roomPipe | `boolean` | Display room code next to hours |
 | reversedOrder | `boolean` | Swap lesson name and hours |
-| pipeText | `string` | Separator text if `roomPipe` is enabled. Default: `|`|
+| pipeText | `string` | Separator text if `roomPipe` is enabled. Default: `\|`|
