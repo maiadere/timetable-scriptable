@@ -37,7 +37,7 @@ async function main(settings) {
   const background = new LinearGradient();
   background.startPoint = new Point(0, 0);
   background.endPoint = new Point(1, 1);
-  background.locations = [-1, 2];
+  background.locations = settings.backgroundLocations || [-1, 2];
   background.colors = settings.background;
 
   const app = new ListWidget();
@@ -177,15 +177,22 @@ async function main(settings) {
     }
 
     const lessonStack = list.addStack();
-    lessonStack.size = new Size(135, 0);
+    lessonStack.size = new Size(settings.lessonWidth || 135, 0);
     lessonStack.backgroundColor = settings.boxColor || new Color("#fff", startTime <= date && date <= endTime ? 0.25 : 0.125);
     lessonStack.cornerRadius = 10;
     lessonStack.setPadding(-1, 10, 0, 5);
     lessonStack.layoutHorizontally();
     lessonStack.centerAlignContent();
 
+        
+    let stackSize = settings.lessonWidth ? settings.lessonWidth - 30 : 105;
+    
+    if (settings.roomPipe) {
+      stackSize += 20;
+    }
+    
     const stack = lessonStack.addStack();
-    stack.size = new Size(105, 0);
+    stack.size = new Size(stackSize, 0);
     stack.layoutVertically();
     stack.centerAlignContent();
     
@@ -291,7 +298,7 @@ async function main(settings) {
 //     list.setPadding(0, 0, 12, 0);
   }
 
-  settings.dev && config.runsInWidget ? Script.setWidget(app) : await app.presentMedium();
+  !settings.dev || config.runsInWidget ? Script.setWidget(app) : await app.presentMedium();
   Script.complete();
 }
 
