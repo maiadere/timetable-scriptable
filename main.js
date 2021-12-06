@@ -41,7 +41,6 @@ async function main(settings) {
   background.colors = settings.background;
 
   const app = new ListWidget();
-  app.url = "https://vloapp.pl";
   app.backgroundGradient = background;
 
   const appStack = app.addStack();
@@ -162,6 +161,7 @@ async function main(settings) {
       fakeBtn.textColor = settings.textColor;
       fakeBtn.textOpacity = 0.7;
       fakeBtn.lineLimit = 1;
+      fakeBtn.url = "https://vloapp.pl";
 
       if (config.widgetFamily === "large") {
         currentLessonStack.addSpacer(25);
