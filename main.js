@@ -161,7 +161,7 @@ async function main(settings) {
       fakeBtn.textColor = settings.textColor;
       fakeBtn.textOpacity = 0.7;
       fakeBtn.lineLimit = 1;
-      fakeBtn.url = "https://vloapp.pl";
+      fakeBtn.url = "https://timetable-app.vercel.app";
 
       if (config.widgetFamily === "large") {
         currentLessonStack.addSpacer(25);
