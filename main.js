@@ -280,6 +280,89 @@ async function main(settings) {
     count++;
     list.addSpacer(6);
   });
+  
+  if (count != 0 && config.widgetFamily === "large") {
+    for (let i = 0; i <= 7 - count; i++) {
+      const lesson = {"change":{"unitId":0,"reason":null,"note":null,"id":0,"lessonDate":{"date":"2022-01-12","time":"00:00:00","timestamp":0},"event":null,"change":{"id":0,"separation":false,"type":1},"scheduleId":0,"class":{"id":0,"key":"","displayName":"","symbol":"Bp"}},"time":"","distribution":{"id":0,"key":"","shortcut":"","name":"","partType":""},"order":1,"short":"wf","teacher":{"id":0,"displayName":"","name":"","surname":""},"timestamp":0,"name":""};
+
+        const lessonStack = list.addStack();
+        lessonStack.opacity = 0;
+    lessonStack.size = new Size(135, 0);
+    lessonStack.cornerRadius = 10;
+    lessonStack.setPadding(-1, 10, 0, 5);
+    lessonStack.layoutHorizontally();
+    lessonStack.centerAlignContent();
+    
+    const stack = lessonStack.addStack();
+    stack.size = new Size(105, 0);
+    stack.layoutVertically();
+    stack.centerAlignContent();
+    
+    let wstack;
+    
+    if (settings.reversedOrder) {
+       wstack = stack.addStack();
+      wstack.setPadding(5, 0, 0, 0);
+    }
+    
+
+    let rstack;
+    
+    if (!settings.roomPipe) {
+      rstack = lessonStack.addStack();
+    rstack.setPadding(1, 0, 0, 0);
+    rstack.size = new Size(20, 0);
+    stack.addSpacer(5);
+    }         
+                    
+    if (settings.roomPipe && lesson.room) {
+      let wsubtitle = stack.addStack();
+      
+      let t = wsubtitle.addText(lesson.time);
+    t.font = Font.mediumSystemFont(12);
+    t.textOpacity = 0.8;
+    t.textColor = settings.textColor;
+    
+    let pipe = wsubtitle.addText(settings.pipeText || " | ");
+    pipe.font = Font.mediumSystemFont(12);
+    pipe.textOpacity = 0.4;
+    pipe.textColor = settings.textColor;
+    
+    let t2 = wsubtitle.addText(lesson.room.code);
+    t2.font = Font.mediumSystemFont(12);
+    t2.textOpacity = 0.8;
+    t2.textColor = settings.textColor;
+    
+    } else {
+      
+    let wsubtitle = stack.addText(lesson.time);
+    wsubtitle.font = Font.mediumSystemFont(12);
+    wsubtitle.textOpacity = 0.8;
+    wsubtitle.textColor = settings.textColor;
+  }
+
+    
+    if (!settings.reversedOrder) {
+       wstack = stack.addStack();
+      wstack.setPadding(0, 0, 5, 0);
+    }
+
+    let wtitle = wstack.addText(lesson.name);
+    wtitle.font = Font.boldSystemFont(13);
+    wtitle.textOpacity = 1;
+    wtitle.textColor = settings.textColor;
+    wtitle.lineLimit = 1;
+
+    if (!settings.roomPipe && lesson.room) {
+      let room = rstack.addText(lesson.room.code);
+      room.font = Font.boldSystemFont(12);
+      room.textOpacity = 0.4;
+      room.textColor = settings.textColor;
+    }
+
+    list.addSpacer(6);
+    }
+  }
 
   if (count === 0) {
     if (config.widgetFamily === "medium" || config.widgetFamily === "large") {
@@ -298,7 +381,7 @@ async function main(settings) {
 //     list.setPadding(0, 0, 12, 0);
   }
 
-  !settings.dev || config.runsInWidget ? Script.setWidget(app) : await app.presentMedium();
+  !settings.dev || config.runsInWidget ? Script.setWidget(app) : await app.presentLarge();
   Script.complete();
 }
 
