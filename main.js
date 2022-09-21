@@ -1,6 +1,7 @@
 class Cache {
-  constructor(name) {
-    this.fm = FileManager.iCloud();
+  constructor(name, isLocal) {
+    
+    this.fm = (isLocal)?FileManager.local():FileManager.iCloud();
     this.cachePath = this.fm.joinPath(this.fm.documentsDirectory(), name);
 
     if (!this.fm.fileExists(this.cachePath)) {
@@ -58,7 +59,7 @@ async function main(settings) {
   list.layoutVertically();
   list.setPadding(5, 5, 0, 5);
 
-  const cache = new Cache("timetableCache");
+  const cache = new Cache("timetableCache", settings.localCache || true);
 
   let today = await cache.read("today");
   const date = new Date();
@@ -281,8 +282,8 @@ async function main(settings) {
     list.addSpacer(6);
   });
   
-  if (count != 0 && config.widgetFamily === "large") {
-    for (let i = 0; i <= 7 - count; i++) {
+  if (count != 0 && (config.widgetFamily === "medium" || config.widgetFamily === "large")) {
+    for (let i = 0; i <= ((config.widgetFamily === "medium")?3:7) - count; i++) {
       const lesson = {"change":{"unitId":0,"reason":null,"note":null,"id":0,"lessonDate":{"date":"2022-01-12","time":"00:00:00","timestamp":0},"event":null,"change":{"id":0,"separation":false,"type":1},"scheduleId":0,"class":{"id":0,"key":"","displayName":"","symbol":"Bp"}},"time":"","distribution":{"id":0,"key":"","shortcut":"","name":"","partType":""},"order":1,"short":"wf","teacher":{"id":0,"displayName":"","name":"","surname":""},"timestamp":0,"name":""};
 
         const lessonStack = list.addStack();
