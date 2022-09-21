@@ -36,8 +36,8 @@ const toTitleCase = (phrase) =>
 
 async function main(settings) {
   const background = new LinearGradient();
-  background.startPoint = new Point(0, 0);
-  background.endPoint = new Point(1, 1);
+  background.startPoint = settings.backgroundStart || new Point(0, 0);
+  background.endPoint = settings.backgroundEnd || new Point(1, 1);
   background.locations = settings.backgroundLocations || [-1, 2];
   background.colors = settings.background;
 
