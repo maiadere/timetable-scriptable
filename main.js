@@ -62,121 +62,141 @@ async function main(settings) {
   const cache = new Cache("timetableCache", settings.localCache || true);
 
   let today = await cache.read("today");
+  let thisWeek = await cache.read("week");
   const date = new Date();
 
   try {
-    const req = new Request(`https://hopeful-snyder-d01795.netlify.app/?offset=${settings.offset || 0}`);
+ 	if(!today || !thisWeek){
+    const req = new Request(`https://hopeful-snyder-d01795.netlify.app/?offset=${((settings.preloadNextWeekOnSunday&&date.getDay() == 0)?settings.offset+7:settings.offset) || 0}`);
     const res = await req.loadJSON();
     const t = res[date.getDay() - 1];
 
-    if (!today) {
-      today = t;
+    if (!today && t) {
+      await cache.write("today", t)
+      today = t
     }
-
-    if (t) {
-      cache.write("today", t);
+    
+    if(!thisWeek && res) {
+      await cache.write("week", res)
+      thisWeek = res; 
     }
+  }
   } catch (e) {
     console.log(e);
   }
   
-  console.log(today);
-
-  let count = 0;
-
-  today.forEach((lesson) => {
-    if (config.widgetFamily === "medium" && count > 3) return;
-    else if (config.widgetFamily === "large" && count > 6) return;
-    else if ((!config.widgetFamily || config.widgetFamily === "small") && count > 2) return;
-
-    if (lesson.name === "Religia") return;
-
-    if (
-      lesson.distribution &&
-      !(
-        lesson.distribution.shortcut === settings.wf ||
-        lesson.distribution.shortcut === settings.lang ||
-        lesson.distribution.shortcut === settings.angInf
+  let week = []
+  
+  for (let i = 0; i<5; i++){
+    let day = {}
+    thisWeek?thisWeek[i].forEach((lesson)=>{
+      if (lesson.name === "Religia") return;
+  
+      if (
+        lesson.distribution &&
+        !(
+          lesson.distribution.shortcut === settings.wf ||
+          lesson.distribution.shortcut === settings.lang ||
+          lesson.distribution.shortcut === settings.angInf
+        )
       )
-    )
-      return;
+        return;
+    	day[lesson.time] = {name: lesson.short, room: lesson.room?lesson.room.code.toString().padStart(2):"WF"}
+    }):null
+    week.push(day)
+   }
+//   console.log(thisWeek)
+  
+  let count = 0;
+  
+  if(config.widgetFamily !== "extraLarge"){
 
-    const parseTime = (i) =>
-      lesson.time
-        .split(" - ")
-        [i].split(":")
-        .map((n) => +n);
-
-    const rawTime = [parseTime(0), parseTime(1)];
-
-    const startTime = new Date(date);
-    startTime.setHours(rawTime[0][0]);
-    startTime.setMinutes(rawTime[0][1]);
-
-    const endTime = new Date(date);
-    endTime.setHours(rawTime[1][0]);
-    endTime.setMinutes(rawTime[1][1]);
-
-    if (date.getHours() > endTime.getHours()) return;
-    if (date.getHours() === endTime.getHours() && date.getMinutes() > endTime.getMinutes()) return;
-
-    if ((config.widgetFamily === "medium" || config.widgetFamily === "large") && count === 0) {
-      let wsubtitle = currentLessonStack.addText(lesson.time);
-      wsubtitle.font = Font.mediumSystemFont(12);
-      wsubtitle.textOpacity = 0.8;
-      wsubtitle.textColor = settings.textColor;
-      currentLessonStack.addSpacer(2);
-
-      let wtitle = currentLessonStack.addText(lesson.name);
-      wtitle.font = Font.blackSystemFont(16);
-      wtitle.textColor = settings.textColor;
-      wtitle.lineLimit = 1;
-      currentLessonStack.addSpacer(4);
-
-      let teacher = currentLessonStack.addText(toTitleCase(lesson.teacher.displayName));
-      teacher.font = Font.boldSystemFont(12);
-      teacher.textColor = settings.textColor;
-      teacher.lineLimit = 1;
-      currentLessonStack.addSpacer(6);
-
-      let room = currentLessonStack.addStack();
-      room.size = new Size(0, 25);
-      room.setPadding(2.5, 5, 2.5, 5);
-      room.centerAlignContent();
-      room.cornerRadius = 10;
-      
-      if (lesson.room) {
-        room.backgroundColor = settings.boxColor || new Color("#fff", 0.125);
-      
-        let roomText = room.addText(lesson.room.code);
-        roomText.font = Font.boldSystemFont(12);
-        roomText.textOpacity = 0.8;
-        roomText.textColor = settings.textColor;
-      }
-
-      let btnStack = currentLessonStack.addStack();
-      btnStack.setPadding(25, 0, 0, 0);
-
-      const fakeBtn = btnStack.addText("View all →");
-      fakeBtn.font = Font.blackSystemFont(14);
-      fakeBtn.textColor = settings.textColor;
-      fakeBtn.textOpacity = 0.7;
-      fakeBtn.lineLimit = 1;
-      fakeBtn.url = "https://timetable-app.vercel.app";
-
-      if (config.widgetFamily === "large") {
-        currentLessonStack.addSpacer(25);
-        const text = currentLessonStack.addText("Buy an iPhone.");
-        text.font = Font.blackSystemFont(16);
-        text.textColor = settings.textColor;
-        text.textOpacity = 0.05;
-        text.lineLimit = 1;
-      }
-
-      count++;
-      return;
-    }
-
+    today.forEach((lesson) => {
+      if (config.widgetFamily === "medium" && count > 3) return;
+      else if (config.widgetFamily === "large" && count > 6) return;
+      else if ((!config.widgetFamily || config.widgetFamily === "small") && count > 2) return;
+  
+      if (lesson.name === "Religia") return;
+  
+      if (
+        lesson.distribution &&
+        !(
+          lesson.distribution.shortcut === settings.wf ||
+          lesson.distribution.shortcut === settings.lang ||
+          lesson.distribution.shortcut === settings.angInf
+        )
+      )
+        return;
+  
+      const parseTime = (i) =>
+        lesson.time
+          .split(" - ")
+          [i].split(":")
+          .map((n) => +n);
+  
+      const rawTime = [parseTime(0), parseTime(1)];
+  
+      const startTime = new Date(date);
+      startTime.setHours(rawTime[0][0]);
+      startTime.setMinutes(rawTime[0][1]);
+  
+      const endTime = new Date(date);
+      endTime.setHours(rawTime[1][0]);
+      endTime.setMinutes(rawTime[1][1]);
+  
+      if (date.getHours() > endTime.getHours()) return;
+      if (date.getHours() === endTime.getHours() && date.getMinutes() > endTime.getMinutes()) return;
+  
+      if ((config.widgetFamily === "medium" || config.widgetFamily === "large") && count === 0) {
+        let wsubtitle = currentLessonStack.addText(lesson.time);
+        wsubtitle.font = Font.mediumSystemFont(12);
+        wsubtitle.textOpacity = 0.8;
+        wsubtitle.textColor = settings.textColor;
+        currentLessonStack.addSpacer(2);
+  
+        let wtitle = currentLessonStack.addText(lesson.name);
+        wtitle.font = Font.blackSystemFont(16);
+        wtitle.textColor = settings.textColor;
+        wtitle.lineLimit = 1;
+        currentLessonStack.addSpacer(4);
+  
+        let teacher = currentLessonStack.addText(toTitleCase(lesson.teacher.displayName));
+        teacher.font = Font.boldSystemFont(12);
+        teacher.textColor = settings.textColor;
+        teacher.lineLimit = 1;
+        currentLessonStack.addSpacer(6);
+  
+        let room = currentLessonStack.addStack();
+        room.size = new Size(0, 25);
+        room.setPadding(2.5, 5, 2.5, 5);
+        room.centerAlignContent();
+        room.cornerRadius = 10;
+        
+        if (lesson.room) {
+          room.backgroundColor = settings.boxColor || new Color("#fff", 0.125);
+        
+          let roomText = room.addText(lesson.room.code);
+          roomText.font = Font.boldSystemFont(12);
+          roomText.textOpacity = 0.8;
+          roomText.textColor = settings.textColor;
+        }
+  
+        let btnStack = currentLessonStack.addStack();
+        btnStack.setPadding(25, 0, 0, 0);
+  
+        const fakeBtn = btnStack.addText("View all →");
+        fakeBtn.font = Font.blackSystemFont(14);
+        fakeBtn.textColor = settings.textColor;
+        fakeBtn.textOpacity = 0.7;
+        fakeBtn.lineLimit = 1;
+        fakeBtn.url = "https://timetable-app.vercel.app";
+  
+ 
+  
+        count++;
+        return;
+      }  
+  
     const lessonStack = list.addStack();
     lessonStack.size = new Size(settings.lessonWidth || 135, 0);
     lessonStack.backgroundColor = settings.boxColor || new Color("#fff", startTime <= date && date <= endTime ? 0.25 : 0.125);
@@ -282,6 +302,189 @@ async function main(settings) {
     list.addSpacer(6);
   });
   
+} else {
+  count = 2;
+  list.layoutHorizontally();
+  const allHours = ["7:30 - 8:15", "8:20 - 9:05", "9:15 - 10:00", "10:10 - 10:55", "11:05 - 11:50", "12:10 - 12:55", "13:05 - 13:50", "14:00 - 14:45", "14:50 - 15:35"];  
+  const allBreaks = ["8:16 - 8:19", "9:06 - 9:14", "10:01 - 10:09", "10:56 - 11:04", "11:51 - 12:09", "12:56 - 13:04", "13:51 - 13:59", "14:46 - 14:49", "15:36 - 15:44"];
+
+  const hours = list.addStack();
+  const weekdaydesc = hours.addStack()
+  weekdaydesc.centerAlignContent()
+  weekdaydesc.size = new Size(100, 28)
+  weekdaydesc.backgroundColor = settings.boxColor || new Color("#fff", 0.125)
+  
+//   const T = weekdaydesc.addText("Timetable")
+//   T.font = Font.blackSystemFont(14);
+//   T.textColor = settings.textColor;
+//   T.textOpacity = 1;
+//   T.lineLimit = 1;
+// 
+//   let sym = SFSymbol.named("hourglass")
+//   const symbol = weekdaydesc.addImage(sym.image)
+//   symbol.tintColor = settings.textColor
+//   symbol.imageSize = new Size(20, 20)
+
+  let sym = SFSymbol.named("clock")
+  const symbol = weekdaydesc.addImage(sym.image)
+  symbol.tintColor = settings.textColor
+  symbol.imageSize = new Size(25, 25)
+  
+  let tS = SFSymbol.named("tablecells")
+  const symbol2 = weekdaydesc.addImage(tS.image)
+  symbol2.tintColor = settings.textColor
+  symbol2.imageSize = new Size(32, 32)
+  
+  hours.addSpacer(5)
+  weekdaydesc.cornerRadius = 10
+  
+  let markX = date.getDay()-1
+  let markY = -1
+  let breakY = -1
+  
+  for (let i = 0; i<allHours.length; i++) {	
+    	const parseTime = (z) =>
+        allHours[i]
+          .split(" - ")
+          [z].split(":")
+          .map((n) => +n);
+          
+       const parseBreakTime = (z) =>
+        allBreaks[i]
+          .split(" - ")
+          [z].split(":")
+          .map((n) => +n);
+  
+      const rawTime = [parseTime(0), parseTime(1)];
+      const breakTime = [parseBreakTime(0), parseBreakTime(1)]
+      
+  
+      const startTime = new Date(date);
+      startTime.setHours(rawTime[0][0]);
+      startTime.setMinutes(rawTime[0][1]);
+  
+      const endTime = new Date(date);
+      endTime.setHours(rawTime[1][0]);
+      endTime.setMinutes(rawTime[1][1]);
+      
+      const startBTime = new Date(date);
+      startBTime.setHours(breakTime[0][0])
+      startBTime.setMinutes(breakTime[0][1])
+      
+      const endBTime = new Date(date);
+      endBTime.setHours(breakTime[1][0])
+      endBTime.setMinutes(breakTime[1][1])
+      
+   	hour = hours.addStack();
+  	const text = hour.addText(allHours[i]);
+  		text.font = Font.blackSystemFont(12);
+        text.textColor = settings.textColor;
+        text.textOpacity = 1;
+        text.lineLimit = 1;
+  	hour.centerAlignContent();
+  	hour.backgroundColor = settings.boxColor || new Color("#fff", (startTime <= date && date <= endTime && markX>=0 && markX <=4)?0.35:0.125);
+  	
+	if(startTime <= date && date <= endTime){
+		markY = i
+	}
+	else if(startTime > date
+   && markY == -1){
+		markY = -2
+	}
+
+	if(startBTime <= date && date <= endBTime){
+		breakY = i
+	}
+	
+  	hour.size = new Size(100, 28)
+  hour.cornerRadius = 10
+  hours.addSpacer(5)
+  	
+  }
+  list.addSpacer(5)
+  hours.layoutVertically();
+  weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+  
+  for (let i = 0; i<5;i++) {
+  
+  	const day = list.addStack();
+    day.layoutVertically();
+    weekDay = day.addStack();
+    const text = weekDay.addText(weekDays[i]);
+    text.font = Font.blackSystemFont(16);
+        text.textColor = settings.textColor;
+        text.textOpacity = 1;
+        text.lineLimit = 1;
+    weekDay.centerAlignContent()
+    weekDay.backgroundColor = settings.boxColor || new Color("fff", i==markX?0.35:0.125)
+    weekDay.cornerRadius = 10
+    weekDay.size = new Size(112, 28)
+    day.addSpacer(5)
+    list.addSpacer(5)
+    
+    for (let j = 0; j<allHours.length; j++){
+      const lesson = day.addStack()
+      day.addSpacer(5)
+      lesson.size = new Size(112, 28)
+      lesson.centerAlignContent()
+      lesson.cornerRadius = 10
+      
+//       const shouldItHide = (((settings.preloadNextWeekOnSunday&&date.getDay()==0)?false:(settings.hidePastLessons)) && ((markX == i && markY > j)||(markX >= i && markY == -1)||(markX > i)))
+	  let loadedSunday = settings.preloadNextWeekOnSunday&&date.getDay()==0
+	  let inMarks = ((markX == i && markY > j) ||(markX > i) || (breakY >= j && markX == i))
+	  let shouldItHide = loadedSunday?false:inMarks
+		console.log("hiding: "+shouldItHide.toString())
+      const shouldHighlight = markX == i && (markY == j || markY == j)
+      
+      console.log(i.toString()+" "+markX)
+      console.log(j.toString()+" "+markY)
+      console.log(shouldHighlight)
+      
+      lesson.backgroundColor = settings.boxColor || new Color("#fff", (markX == i && markY ==j)?0.35:0.125)
+      if(week[i][allHours[j]] && !shouldItHide){
+        const lessonName = lesson.addStack()
+        lessonName.size = new Size(85,0)
+        
+      	const lessonObject = week[i][allHours[j]];
+		const text = lessonName.addText(lessonObject.name)
+		text.font = Font.blackSystemFont(12);
+        text.textColor = settings.textColor;
+        text.textOpacity = 0.8;
+        text.lineLimit = 1;
+        
+        
+        
+        const textH = lesson.addText(lessonObject.room)
+        textH.font = Font.blackSystemFont(12);
+        textH.textColor = settings.textColor;
+        textH.textOpacity = 0.6;
+        textH.lineLimit = 1;
+    }else if(week[i][allHours[j]] && shouldItHide){
+    const lessonName = lesson.addStack()
+        lessonName.size = new Size(85,0)
+        
+      	const lessonObject = week[i][allHours[j]];
+		const text = lessonName.addText(lessonObject.name)
+		text.font = Font.blackSystemFont(12);
+        text.textColor = settings.textColor;
+        text.textOpacity = 0.5;
+        text.lineLimit = 1;
+        
+        
+        
+        const textH = lesson.addText(lessonObject.room)
+        textH.font = Font.blackSystemFont(12);
+        textH.textColor = settings.textColor;
+        textH.textOpacity = 0.35;
+        textH.lineLimit = 1;
+  	lesson.backgroundColor = settings.boxColor || new Color("#fff", 0.03125)
+  }else{
+  	lesson.backgroundColor = settings.boxColor || new Color("#fff", 0.03125)
+  }
+  }
+  }
+}
+  
   if (count != 0 && (config.widgetFamily === "medium" || config.widgetFamily === "large")) {
     for (let i = 0; i <= ((config.widgetFamily === "medium")?3:7) - count; i++) {
       const lesson = {"change":{"unitId":0,"reason":null,"note":null,"id":0,"lessonDate":{"date":"2022-01-12","time":"00:00:00","timestamp":0},"event":null,"change":{"id":0,"separation":false,"type":1},"scheduleId":0,"class":{"id":0,"key":"","displayName":"","symbol":"Bp"}},"time":"","distribution":{"id":0,"key":"","shortcut":"","name":"","partType":""},"order":1,"short":"wf","teacher":{"id":0,"displayName":"","name":"","surname":""},"timestamp":0,"name":""};
@@ -382,7 +585,7 @@ async function main(settings) {
 //     list.setPadding(0, 0, 12, 0);
   }
 
-  !settings.dev || config.runsInWidget ? Script.setWidget(app) : await app.presentLarge();
+  !settings.dev || config.runsInWidget ? Script.setWidget(app) : await app.presentExtraLarge();
   Script.complete();
 }
 
