@@ -63,24 +63,27 @@ async function main(settings) {
 
   let today = await cache.read("today");
   let thisWeek = await cache.read("week");
+  console.log(thisWeek)
   const date = new Date();
 
   try {
- 	if(!today || !thisWeek){
+ 	
     const req = new Request(`https://hopeful-snyder-d01795.netlify.app/?offset=${((settings.preloadNextWeekOnSunday&&date.getDay() == 0)?settings.offset+7:settings.offset) || 0}`);
     const res = await req.loadJSON();
     const t = res[date.getDay() - 1];
-
-    if (!today && t) {
+	
+    if(t.toString() != today.toString()){
       await cache.write("today", t)
       today = t
+      console.log("today cache replaced")
     }
     
-    if(!thisWeek && res) {
+    if(res.toString() != thisWeek.toString()){
       await cache.write("week", res)
       thisWeek = res; 
+      console.log("week cache replaced")
     }
-  }
+  
   } catch (e) {
     console.log(e);
   }
@@ -105,7 +108,6 @@ async function main(settings) {
     }):null
     week.push(day)
    }
-//   console.log(thisWeek)
   
   let count = 0;
   
@@ -314,16 +316,18 @@ async function main(settings) {
   weekdaydesc.size = new Size(100, 28)
   weekdaydesc.backgroundColor = settings.boxColor || new Color("#fff", 0.125)
   
-//   const T = weekdaydesc.addText("Timetable")
-//   T.font = Font.blackSystemFont(14);
-//   T.textColor = settings.textColor;
-//   T.textOpacity = 1;
-//   T.lineLimit = 1;
-// 
-//   let sym = SFSymbol.named("hourglass")
-//   const symbol = weekdaydesc.addImage(sym.image)
-//   symbol.tintColor = settings.textColor
-//   symbol.imageSize = new Size(20, 20)
+if(settings.exlLogo?settings.exlLogo == 2:false){    
+  const T = weekdaydesc.addText("Timetable")
+  T.font = Font.blackSystemFont(14);
+  T.textColor = settings.textColor;
+  T.textOpacity = 1;
+  T.lineLimit = 1;
+
+  let sym = SFSymbol.named("hourglass")
+  const symbol = weekdaydesc.addImage(sym.image)
+  symbol.tintColor = settings.textColor
+  symbol.imageSize = new Size(20, 20)
+  }else{
 
   let sym = SFSymbol.named("clock")
   const symbol = weekdaydesc.addImage(sym.image)
@@ -334,6 +338,7 @@ async function main(settings) {
   const symbol2 = weekdaydesc.addImage(tS.image)
   symbol2.tintColor = settings.textColor
   symbol2.imageSize = new Size(32, 32)
+}
   
   hours.addSpacer(5)
   weekdaydesc.cornerRadius = 10
@@ -429,16 +434,10 @@ async function main(settings) {
       lesson.centerAlignContent()
       lesson.cornerRadius = 10
       
-//       const shouldItHide = (((settings.preloadNextWeekOnSunday&&date.getDay()==0)?false:(settings.hidePastLessons)) && ((markX == i && markY > j)||(markX >= i && markY == -1)||(markX > i)))
 	  let loadedSunday = settings.preloadNextWeekOnSunday&&date.getDay()==0
 	  let inMarks = ((markX == i && markY > j) ||(markX > i) || (breakY >= j && markX == i))
 	  let shouldItHide = loadedSunday?false:inMarks
-		console.log("hiding: "+shouldItHide.toString())
       const shouldHighlight = markX == i && (markY == j || markY == j)
-      
-      console.log(i.toString()+" "+markX)
-      console.log(j.toString()+" "+markY)
-      console.log(shouldHighlight)
       
       lesson.backgroundColor = settings.boxColor || new Color("#fff", (markX == i && markY ==j)?0.35:0.125)
       if(week[i][allHours[j]] && !shouldItHide){

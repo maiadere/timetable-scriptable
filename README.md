@@ -13,14 +13,18 @@ Following settings are available:
 | Setting | Type | Description |
 | - | - | - |
 | offset | `number` | Offset for timetable api |
-| lang | `string` | Language group |
-| wf | `string` | WF |
+| lang | `string` | Language group (gr1n, gr2n, gr3n, gr4r) |
+| wf | `string` | WF (CH, DZ) |
 | background | `Color[]` | Background gradients |
 | backgroundLocations | `number[]` | Background locations |
-| angInf | `string` | English group |
+| angInf | `string` | English group (gr1, gr2) |
 | textColor | `Color` | Text color |
 | boxColor | `Color` | Box color |
 | lessonWidth | `number` | Lesson box width |
 | roomPipe | `boolean` | Display room code next to hours |
 | reversedOrder | `boolean` | Swap lesson name and hours |
 | pipeText | `string` | Separator text if `roomPipe` is enabled. Default: `\|`|
+| hidePastLessons | `boolean` | hide lessons that already passed on ExL widget |
+| preloadNextWeekOnSunday | `boolean` | shows next week on sunday on ExL widget |
+| exlLogo | `int` | 1 for icons only, 2 for text + icon |
+| dev | `boolean` | presents widget in scriptable editor |

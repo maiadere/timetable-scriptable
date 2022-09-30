@@ -1,10 +1,25 @@
+const themes = {
+  blackWhite: {
+    textColor: new Color("#fff700"),
+    background: [new Color("#71f8ff"), new Color("#45bae3")],
+  },
+  
+  blu: {
+    textColor: Color.white(),
+    background: [new Color("#00F260"), new Color("#0575E6")],
+  }
+};
+
 const settings = {
   offset: 0,
-  lang: "gr1n",
-  wf: "CH",
+  lang: "gr1n", 
+  wf: "CH", 
   angInf: "gr1",
-  textColor: Color.white(),
-  background: [new Color("#3558cc"), new Color("#a05aa3")],
+  ...themes.blu, //theme selection
+  hidePastLessons: true, 
+  preloadNextWeekOnSunday: true, 
+  exlLogo: 1,
+  dev: false, 
 };
 
 const url = "https://raw.githubusercontent.com/akuvfx/timetable-scriptable/main/main.js";
