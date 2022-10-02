@@ -1,7 +1,7 @@
 class Cache {
   constructor(name, isLocal) {
     
-    this.fm = (isLocal)?FileManager.local():FileManager.iCloud();
+    this.fm = FileManager.local();
     this.cachePath = this.fm.joinPath(this.fm.documentsDirectory(), name);
 
     if (!this.fm.fileExists(this.cachePath)) {
@@ -12,10 +12,10 @@ class Cache {
   async read(key) {
     try {
       const path = this.fm.joinPath(this.cachePath, key);
-      await this.fm.downloadFileFromiCloud(path);
       const value = this.fm.readString(path);
       return JSON.parse(value);
     } catch (error) {
+      console.log(error)
       return null;
     }
   }
@@ -26,6 +26,7 @@ class Cache {
     this.fm.writeString(path, JSON.stringify(value));
   }
 }
+
 
 const toTitleCase = (phrase) =>
   phrase
