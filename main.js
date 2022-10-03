@@ -73,13 +73,13 @@ async function main(settings) {
     const res = await req.loadJSON();
     const t = res[date.getDay() - 1];
 	
-    if(t.toString() != today.toString()){
+    if(t != today) {
       await cache.write("today", t)
       today = t
       console.log("today cache replaced")
     }
     
-    if(res.toString() != thisWeek.toString()){
+    if(res != thisWeek){
       await cache.write("week", res)
       thisWeek = res; 
       console.log("week cache replaced")
