@@ -64,7 +64,6 @@ async function main(settings) {
 
   let today = await cache.read("today");
   let thisWeek = await cache.read("week");
-  console.log(thisWeek)
   const date = new Date();
 
   try {
@@ -72,7 +71,9 @@ async function main(settings) {
     const req = new Request(`https://hopeful-snyder-d01795.netlify.app/?offset=${((settings.preloadNextWeekOnSunday&&date.getDay() == 0)?settings.offset+7:settings.offset) || 0}`);
     const res = await req.loadJSON();
     const t = res[date.getDay() - 1];
-	
+
+    console.log("req: ", res)
+
     if(t != today) {
       await cache.write("today", t)
       today = t
